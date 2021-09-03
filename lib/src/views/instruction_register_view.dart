@@ -13,6 +13,7 @@ class InstructionRegisterView extends StatelessWidget {
         children: [
           Text('Instruction Register'),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LED(state.instruction & 0x01 == 0x01),
               LED(state.instruction & 0x02 == 0x02),

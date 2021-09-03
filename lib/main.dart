@@ -43,7 +43,6 @@ class MyApp extends StatelessWidget {
                 horizontal: 8.0,
               ),
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   DatabusView(),
                   ClockView(),

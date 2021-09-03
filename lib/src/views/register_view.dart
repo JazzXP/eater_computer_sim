@@ -15,6 +15,7 @@ class RegisterView extends StatelessWidget {
         children: [
           Text('Register ${register == Reg.A ? 'A' : 'B'}'),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LED(val & 0x01 == 0x01),
               LED(val & 0x02 == 0x02),

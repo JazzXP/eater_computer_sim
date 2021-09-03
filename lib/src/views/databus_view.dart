@@ -13,6 +13,7 @@ class DatabusView extends StatelessWidget {
         children: [
           Text('Databus'),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LED(state.databus & 0x1 == 0x1),
               LED(state.databus & 0x2 == 0x2),

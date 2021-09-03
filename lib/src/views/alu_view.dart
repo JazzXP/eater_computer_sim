@@ -13,6 +13,7 @@ class ALUView extends StatelessWidget {
         children: [
           Text('ALU'),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LED(state.aluresult & 0x1 == 0x1),
               LED(state.aluresult & 0x2 == 0x2),
