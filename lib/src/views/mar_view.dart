@@ -19,7 +19,6 @@ class MARView extends StatelessWidget {
                     'Memory Address Register',
                     input: state.control & ctlMI == ctlMI,
                   ),
-                  Text('${state.mar}'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -27,6 +26,10 @@ class MARView extends StatelessWidget {
                       LED(state.mar & 0x2 == 0x2),
                       LED(state.mar & 0x4 == 0x4),
                       LED(state.mar & 0x8 == 0x8),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text('${state.mar}'),
+                      ),
                     ],
                   )
                 ],

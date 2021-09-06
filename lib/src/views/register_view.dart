@@ -45,6 +45,10 @@ class RegisterView extends StatelessWidget {
                 LED(val & 0x20 == 0x20),
                 LED(val & 0x40 == 0x40),
                 LED(val & 0x80 == 0x80),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text('$val'),
+                ),
               ],
             )
           ],

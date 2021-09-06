@@ -16,75 +16,92 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Container(
-        color: Colors.blueAccent,
-        child: BlocProvider<IoBloc>(
-          create: (context) {
-            var bloc = IoBloc();
-            List<int> prog = List.filled(64, 0);
-            prog[0] = assemblyTokens.LDA.index << 4 | 15;
-            prog[1] = assemblyTokens.ADD.index << 4 | 14;
-            prog[2] = assemblyTokens.OUT.index << 4;
-            prog[3] = assemblyTokens.HLT.index << 4;
-            prog[14] = 3;
-            prog[15] = 0;
-            bloc.add(MemoryLoad(prog));
-            Timer.periodic(Duration(milliseconds: 500), (timer) {
-              if (bloc.state.autoClock) {
-                bloc.add(Tick());
-              }
-            });
-            return bloc;
-          },
-          child: Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 50.0,
-                horizontal: 8.0,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: Layout());
+  }
+}
+
+class Layout extends StatelessWidget {
+  const Layout({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.blueAccent,
+      child: BlocProvider<IoBloc>(
+        create: (context) {
+          var bloc = IoBloc();
+          List<int> prog = List.filled(16, 0);
+          prog[0] = assemblyTokens.LDA.index << 4 | 15;
+          prog[1] = assemblyTokens.ADD.index << 4 | 14;
+          prog[2] = assemblyTokens.OUT.index << 4;
+          prog[3] = assemblyTokens.JMP.index << 4 | 1;
+          prog[14] = 3;
+          prog[15] = 0;
+          bloc.add(MemoryLoad(prog));
+          Timer.periodic(Duration(milliseconds: 500), (timer) {
+            if (bloc.state.autoClock) {
+              bloc.add(Tick());
+            }
+          });
+          return bloc;
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Flex(direction: Axis.vertical, children: [
+              Flexible(
+                flex: 1,
+                child: ClockView(),
               ),
-              child: Flex(
-                direction: Axis.horizontal,
-                children: [
-                  Flexible(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        ClockView(),
-                        MARView(),
-                        RAMView(),
-                        InstructionRegisterView(),
-                        ControlView(),
-                        ResetButton(),
-                      ],
+              Flexible(
+                flex: 5,
+                child: Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    Flexible(
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          MARView(),
+                          RAMView(),
+                          InstructionRegisterView(),
+                          ControlView(),
+                        ],
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    flex: 1,
-                    child: Column(
-                      children: [
-                        DatabusView(),
-                      ],
+                    Flexible(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          DatabusView(),
+                        ],
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        ProgramCounterView(),
-                        RegisterView(Reg.A),
-                        ALUView(),
-                        RegisterView(Reg.B),
-                        OutputView(),
-                      ],
+                    Flexible(
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ProgramCounterView(),
+                          RegisterView(Reg.A),
+                          ALUView(),
+                          RegisterView(Reg.B),
+                          OutputView(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              Flexible(
+                flex: 1,
+                child: ResetButton(),
+              )
+            ]),
           ),
         ),
       ),

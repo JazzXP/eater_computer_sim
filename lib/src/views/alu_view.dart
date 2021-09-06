@@ -30,6 +30,10 @@ class ALUView extends StatelessWidget {
                 LED(state.aluresult & 0x20 == 0x20),
                 LED(state.aluresult & 0x40 == 0x40),
                 LED(state.aluresult & 0x80 == 0x80),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text('${state.aluresult}'),
+                ),
               ],
             )
           ],
