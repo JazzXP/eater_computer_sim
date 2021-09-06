@@ -1,0 +1,13 @@
+version: "3"
+services:
+  eater:
+    image: registry.sdickinson.dev/eater_computer:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.eater.rule=Host(`eater.sdickinson.dev`)"
+      - "traefik.http.routers.eater.tls.certresolver=myresolver"
+    networks:
+      - web
+networks:
+  web:
+    external: true
