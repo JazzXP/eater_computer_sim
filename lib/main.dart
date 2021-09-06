@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:eater_computer/src/bloc/io_bloc.dart';
+import 'package:eater_computer/src/constants.dart';
 import 'package:eater_computer/src/views/alu_view.dart';
 import 'package:eater_computer/src/views/clock_view.dart';
+import 'package:eater_computer/src/views/control_view.dart';
 import 'package:eater_computer/src/views/databus_view.dart';
 import 'package:eater_computer/src/views/instruction_register_view.dart';
 import 'package:eater_computer/src/views/mar_view.dart';
@@ -31,8 +33,10 @@ class MyApp extends StatelessWidget {
         child: BlocProvider<IoBloc>(
           create: (context) {
             var bloc = IoBloc();
-            Timer.periodic(Duration(seconds: 1), (timer) {
-              bloc.add(Tick());
+            Timer.periodic(Duration(milliseconds: 500), (timer) {
+              if ((bloc.state.control & ctlHLT) != ctlHLT) {
+                bloc.add(Tick());
+              }
             });
             return bloc;
           },
@@ -54,6 +58,7 @@ class MyApp extends StatelessWidget {
                   ALUView(),
                   RegisterView(Reg.B),
                   OutputView(),
+                  ControlView(),
                 ],
               ),
             ),

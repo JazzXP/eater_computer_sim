@@ -21,6 +21,7 @@ class IoBloc extends Bloc<IoEvent, IoState> {
       registerB,
       alu,
       output,
+      controlLogic,
     ];
   }
 
@@ -247,58 +248,67 @@ class IoBloc extends Bloc<IoEvent, IoState> {
   }
 
   void moduleMAR() {
-    if (state.clock && state.control & ctlMI == ctlMI) {
+    var MI = (state.control & ctlMI) == 0; // invert
+    if (state.clock && MI) {
       add(MemoryAddressRegister(state.databus));
     }
   }
 
   void ram() {
-    if (state.control & ctlRI == ctlRI) {
+    if (state.clock && state.control & ctlRI == ctlRI) {
       add(Memory(state.databus));
     }
-    if (state.control & ctlRO == ctlRO) {
+    var RO = (state.control & ctlRO) == 0; // Invert
+    if (state.clock && RO) {
       add(Databus(state.memory[state.mar]));
     }
   }
 
   void instructionRegister() {
-    if (state.control & ctlIO == ctlIO) {
+    var IO = (state.control & ctlIO) == 0; // Invert
+    if (state.clock && IO) {
       add(Databus(state.instruction));
     }
-    if (state.control & ctlII == ctlII) {
+    var II = (state.control & ctlII) == 0; // Invert
+    if (state.clock && II) {
       add(Instruction(state.databus));
     }
   }
 
   void programCounter() {
-    if (state.control & ctlCE == ctlCE) {
+    if (state.clock && state.control & ctlCE == ctlCE) {
       add(ProgramCounterIncrement());
     }
-    if (state.control & ctlCO == ctlCO) {
+    var CO = (state.control & ctlCO) == 0; // Invert
+    if (state.clock && CO) {
       add(Databus(state.databus & 0xf0 | state.pc & 0x0f));
     }
-    if (state.control & ctlJ == ctlJ) {
+    var J = (state.control & ctlJ) == 0; // Invert
+    if (state.clock && J) {
       add(ProgramCounterJump(state.databus & 0x0f));
     }
   }
 
   void registerA() {
-    if (state.control & ctlAI == ctlAI) {
+    var AI = (state.control & ctlAI) == 0; // Invert
+    if (state.clock && AI) {
       add(Register(Reg.A, state.databus));
     }
-    if (state.control & ctlAO == ctlAO) {
+    var AO = (state.control & ctlAO) == 0; // Invert
+    if (state.clock && AO) {
       add(Databus(state.areg));
     }
   }
 
   void registerB() {
-    if (state.control & ctlBI == ctlBI) {
+    var BI = (state.control & ctlBI) == 0; // Invert
+    if (state.clock && BI) {
       add(Register(Reg.B, state.databus));
     }
   }
 
   void alu() {
-    if (state.control & ctlSU == ctlSU) {
+    if (state.clock && state.control & ctlSU == ctlSU) {
       int aluResult = state.areg - state.breg;
       if (aluResult < 0) {
         aluResult += 255;
@@ -313,15 +323,213 @@ class IoBloc extends Bloc<IoEvent, IoState> {
       }
       add(ALUResult(aluResult));
     }
-
-    if (state.control & ctlEO == ctlEO) {
+    var EO = (state.control & ctlEO) == 0; // Invert
+    if (state.clock && EO) {
       add(Databus(state.aluresult));
     }
   }
 
   void output() {
-    if (state.control & ctlOI == ctlOI) {
+    if (state.clock && state.control & ctlOI == ctlOI) {
       add(OutputData(state.databus));
+    }
+  }
+
+  int _step = 0;
+  void controlLogic() {
+    if (!state.clock) {
+      switch (assemblyTokens.values[state.instruction]) {
+        case assemblyTokens.LDA:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlMI));
+              break;
+            case 3:
+              add(Control(ctlRO | ctlAI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.ADD:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlMI));
+              break;
+            case 3:
+              add(Control(ctlRO | ctlBI));
+              break;
+            case 4:
+              add(Control(ctlEO | ctlAI | ctlFI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.SUB:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlMI));
+              break;
+            case 3:
+              add(Control(ctlRO | ctlBI));
+              break;
+            case 4:
+              add(Control(ctlEO | ctlAI | ctlSU | ctlFI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.STA:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlMI));
+              break;
+            case 3:
+              add(Control(ctlAO | ctlRI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.STA:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlMI));
+              break;
+            case 3:
+              add(Control(ctlAO | ctlRI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.LDI:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlAI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.JMP:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | ctlJ));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.JC:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | (state.overflow ? ctlJ : 0)));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.JZ:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlIO | (state.zeroflag ? ctlJ : 0)));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.OUT:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlAO | ctlOI));
+              _step = 0;
+              return;
+          }
+          break;
+        case assemblyTokens.HLT:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            case 2:
+              add(Control(ctlHLT));
+              _step = 0;
+              return;
+          }
+          break;
+        default:
+          switch (_step) {
+            case 0:
+              add(Control(ctlCO | ctlMI));
+              break;
+            case 1:
+              add(Control(ctlRO | ctlII | ctlCE));
+              break;
+            default:
+              add(Control(0));
+              _step = 0;
+              return;
+          }
+          break;
+      }
+      _step++;
     }
   }
 }

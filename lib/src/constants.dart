@@ -14,3 +14,22 @@ final int ctlCE = int.parse("0001000000000000", radix: 2);
 final int ctlCO = int.parse("0010000000000000", radix: 2);
 final int ctlJ = int.parse("0100000000000000", radix: 2);
 final int ctlFI = int.parse("1000000000000000", radix: 2);
+
+enum assemblyTokens {
+  NOP,
+  LDA,
+  ADD,
+  SUB,
+  STA,
+  LDI,
+  JMP,
+  JC,
+  JZ,
+  UNDEF1,
+  UNDEF2,
+  UNDEF3,
+  UNDEF4,
+  UNDEF5,
+  OUT,
+  HLT,
+}

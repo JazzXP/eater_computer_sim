@@ -9,7 +9,10 @@ class LED extends StatelessWidget {
     return Container(
       width: 20,
       height: 20,
-      color: on ? Colors.red : Colors.white,
+      decoration: ShapeDecoration(
+        shape: CircleBorder(),
+        color: on ? Colors.red : Colors.red.shade100,
+      ),
     );
   }
 }

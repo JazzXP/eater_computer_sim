@@ -7,7 +7,11 @@ class Tick extends IoEvent {}
 
 class Databus extends IoEvent {
   final int databus;
-  Databus(this.databus) : super();
+  Databus(this.databus) : super() {
+    if (this.databus != 0) {
+      print('Databus set');
+    }
+  }
 }
 
 class Control extends IoEvent {

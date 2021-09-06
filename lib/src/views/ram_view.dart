@@ -9,7 +9,8 @@ class RAMView extends StatelessWidget {
     StringBuffer out = StringBuffer();
     for (int i = 0; i < ram.length; i += 8) {
       for (int j = 0; j < 8; j++) {
-        out.write(ram[i + j]);
+        out.write(ram[i + j].toRadixString(16).padLeft(2, '0'));
+        out.write(' ');
       }
       out.write('\n');
     }
