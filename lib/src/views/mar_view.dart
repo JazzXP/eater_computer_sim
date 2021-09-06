@@ -11,26 +11,26 @@ class MARView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<IoBloc, IoState>(
-      builder: (context, state) {
-        return Column(
-          children: [
-            ModuleTitle(
-              'Memory Address Register',
-              input: state.control & ctlMI == ctlMI,
-            ),
-            Text('${state.mar}'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                LED(state.mar & 0x1 == 0x1),
-                LED(state.mar & 0x2 == 0x2),
-                LED(state.mar & 0x4 == 0x4),
-                LED(state.mar & 0x8 == 0x8),
-              ],
-            )
-          ],
-        );
-      },
-    );
+        builder: (context, state) => Container(
+              decoration: BoxDecoration(border: Border.all()),
+              child: Column(
+                children: [
+                  ModuleTitle(
+                    'Memory Address Register',
+                    input: state.control & ctlMI == ctlMI,
+                  ),
+                  Text('${state.mar}'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LED(state.mar & 0x1 == 0x1),
+                      LED(state.mar & 0x2 == 0x2),
+                      LED(state.mar & 0x4 == 0x4),
+                      LED(state.mar & 0x8 == 0x8),
+                    ],
+                  )
+                ],
+              ),
+            ));
   }
 }

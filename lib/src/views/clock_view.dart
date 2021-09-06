@@ -9,29 +9,33 @@ class ClockView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<IoBloc, IoState>(
-      builder: (context, state) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ModuleTitle('Clock'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LED(state.clock),
-              Text('Auto'),
-              Checkbox(
-                  value: state.autoClock,
-                  onChanged: (event) {
-                    BlocProvider.of<IoBloc>(context)
-                        .add(AutoClock(!state.autoClock));
-                  }),
-              TextButton(
-                  onPressed: () {
-                    BlocProvider.of<IoBloc>(context).add(Tick());
-                  },
-                  child: Text('Tick')),
-            ],
-          ),
-        ],
+      builder: (context, state) => Container(
+        decoration: BoxDecoration(border: Border.all()),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            ModuleTitle('Clock'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                LED(state.clock),
+                Text('Auto'),
+                Checkbox(
+                    value: state.autoClock,
+                    onChanged: (event) {
+                      BlocProvider.of<IoBloc>(context)
+                          .add(AutoClock(!state.autoClock));
+                    }),
+                TextButton(
+                    onPressed: () {
+                      BlocProvider.of<IoBloc>(context).add(Tick());
+                    },
+                    child: Text('Tick')),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

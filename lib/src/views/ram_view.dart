@@ -8,21 +8,7 @@ import '../constants.dart';
 class RAMView extends StatelessWidget {
   const RAMView({Key? key}) : super(key: key);
 
-  String _ramText(List<int> ram) {
-    StringBuffer out = StringBuffer();
-    for (int i = 0; i < ram.length; i += 8) {
-      for (int j = 0; j < 8; j++) {
-        out.write(ram[i + j].toRadixString(16).padLeft(2, '0'));
-        if (j < 7) {
-          out.write(' ');
-        }
-      }
-      out.write('\n');
-    }
-    return out.toString();
-  }
-
-  Widget buildRam(IoState state) {
+  Widget _buildRam(IoState state) {
     List<Widget> cols = [];
     for (int i = 0; i < state.memory.length; i += 8) {
       List<Widget> row = [];
@@ -50,15 +36,18 @@ class RAMView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<IoBloc, IoState>(
-      builder: (context, state) => Column(
-        children: [
-          ModuleTitle(
-            'RAM',
-            input: state.control & ctlRI == ctlRI,
-            output: state.control & ctlRO == ctlRO,
-          ),
-          buildRam(state),
-        ],
+      builder: (context, state) => Container(
+        decoration: BoxDecoration(border: Border.all()),
+        child: Column(
+          children: [
+            ModuleTitle(
+              'RAM',
+              input: state.control & ctlRI == ctlRI,
+              output: state.control & ctlRO == ctlRO,
+            ),
+            _buildRam(state),
+          ],
+        ),
       ),
     );
   }

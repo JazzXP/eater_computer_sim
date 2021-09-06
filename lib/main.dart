@@ -46,20 +46,42 @@ class MyApp extends StatelessWidget {
                 vertical: 50.0,
                 horizontal: 8.0,
               ),
-              child: Column(
+              child: Flex(
+                direction: Axis.horizontal,
                 children: [
-                  DatabusView(),
-                  ClockView(),
-                  MARView(),
-                  RAMView(),
-                  InstructionRegisterView(),
-                  ProgramCounterView(),
-                  RegisterView(Reg.A),
-                  ALUView(),
-                  RegisterView(Reg.B),
-                  OutputView(),
-                  ControlView(),
-                  ResetButton(),
+                  Flexible(
+                    flex: 2,
+                    child: Column(
+                      children: [
+                        ClockView(),
+                        MARView(),
+                        RAMView(),
+                        InstructionRegisterView(),
+                        ControlView(),
+                        ResetButton(),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        DatabusView(),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: Column(
+                      children: [
+                        ProgramCounterView(),
+                        RegisterView(Reg.A),
+                        ALUView(),
+                        RegisterView(Reg.B),
+                        OutputView(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -11,14 +11,17 @@ class OutputView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<IoBloc, IoState>(
-      builder: (context, state) => Column(
-        children: [
-          ModuleTitle(
-            'Output',
-            input: state.control & ctlOI == ctlOI,
-          ),
-          Text('${state.outputData}'),
-        ],
+      builder: (context, state) => Container(
+        decoration: BoxDecoration(border: Border.all()),
+        child: Column(
+          children: [
+            ModuleTitle(
+              'Output',
+              input: state.control & ctlOI == ctlOI,
+            ),
+            Text('${state.outputData}'),
+          ],
+        ),
       ),
     );
   }
