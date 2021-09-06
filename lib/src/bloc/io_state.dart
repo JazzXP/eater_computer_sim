@@ -3,8 +3,10 @@ part of 'io_bloc.dart';
 @immutable
 abstract class IoState {
   final bool clock;
+  final bool autoClock;
   final int databus;
   final int control;
+  final int controlStep;
   final int mar;
   final List<int> memory;
   final int instruction;
@@ -17,8 +19,10 @@ abstract class IoState {
   final int outputData;
   IoState({
     required this.clock,
+    required this.autoClock,
     required this.databus,
     required this.control,
+    required this.controlStep,
     required this.mar,
     required this.memory,
     required this.instruction,
@@ -36,8 +40,10 @@ class IoInitial extends IoState {
   IoInitial()
       : super(
           clock: false,
+          autoClock: true,
           databus: 0,
           control: 0,
+          controlStep: 0,
           mar: 0,
           memory: List.filled(64, 0),
           instruction: 0,
@@ -54,8 +60,10 @@ class IoInitial extends IoState {
 class IoUpdated extends IoState {
   IoUpdated({
     required bool clock,
+    required bool autoClock,
     required int databus,
     required int control,
+    required int controlStep,
     required int mar,
     required List<int> memory,
     required int instruction,
@@ -68,8 +76,10 @@ class IoUpdated extends IoState {
     required int outputData,
   }) : super(
           clock: clock,
+          autoClock: autoClock,
           databus: databus,
           control: control,
+          controlStep: controlStep,
           mar: mar,
           memory: memory,
           instruction: instruction,

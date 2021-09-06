@@ -1,7 +1,9 @@
 import 'package:eater_computer/src/bloc/io_bloc.dart';
-import 'package:eater_computer/src/components/led.dart';
+import 'package:eater_computer/src/components/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../constants.dart';
 
 class MARView extends StatelessWidget {
   const MARView({Key? key}) : super(key: key);
@@ -12,7 +14,10 @@ class MARView extends StatelessWidget {
       builder: (context, state) {
         return Column(
           children: [
-            Text('Memory Address Register'),
+            ModuleTitle(
+              'Memory Address Register',
+              input: state.control & ctlMI == ctlMI,
+            ),
             Text('${state.mar}'),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

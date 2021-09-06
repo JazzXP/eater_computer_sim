@@ -1,5 +1,5 @@
 import 'package:eater_computer/src/bloc/io_bloc.dart';
-import 'package:eater_computer/src/components/led.dart';
+import 'package:eater_computer/src/components/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,13 +9,29 @@ class RegisterView extends StatelessWidget {
   const RegisterView(this.register, {Key? key}) : super(key: key);
   final Reg register;
 
+  Widget buildTitle(IoState state) {
+    switch (register) {
+      case Reg.A:
+        return ModuleTitle(
+          'Register A',
+          input: state.control & ctlAI == ctlAI,
+          output: state.control & ctlAO == ctlAO,
+        );
+      case Reg.B:
+        return ModuleTitle(
+          'Register B',
+          input: state.control & ctlBI == ctlBI,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<IoBloc, IoState>(builder: (context, state) {
       int val = register == Reg.A ? state.areg : state.breg;
       return Column(
         children: [
-          Text('Register ${register == Reg.A ? 'A' : 'B'}'),
+          ModuleTitle('Register ${register == Reg.A ? 'A' : 'B'}'),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

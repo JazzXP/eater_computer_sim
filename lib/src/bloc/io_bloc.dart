@@ -10,6 +10,7 @@ part 'io_event.dart';
 part 'io_state.dart';
 
 class IoBloc extends Bloc<IoEvent, IoState> {
+  int databus = 0;
   late final List<Function> modules;
   IoBloc() : super(IoInitial()) {
     modules = [
@@ -29,11 +30,50 @@ class IoBloc extends Bloc<IoEvent, IoState> {
   Stream<IoState> mapEventToState(
     IoEvent event,
   ) async* {
-    if (event is Tick) {
+    if (event is Reset) {
+      _step = 0;
       yield IoUpdated(
-          clock: !state.clock,
+          clock: false,
+          autoClock: state.autoClock,
+          databus: 0,
+          control: 0,
+          controlStep: 0,
+          mar: 0,
+          memory: state.memory,
+          instruction: 0,
+          pc: 0,
+          areg: 0,
+          breg: 0,
+          aluresult: 0,
+          zeroflag: false,
+          overflow: false,
+          outputData: 0);
+    } else if (event is Tick) {
+      if ((state.control & ctlHLT) != ctlHLT) {
+        yield IoUpdated(
+            clock: !state.clock,
+            autoClock: state.autoClock,
+            databus: state.databus,
+            control: state.control,
+            controlStep: _step,
+            mar: state.mar,
+            memory: state.memory,
+            instruction: state.instruction,
+            pc: state.pc,
+            areg: state.areg,
+            breg: state.breg,
+            aluresult: state.aluresult,
+            zeroflag: state.zeroflag,
+            overflow: state.overflow,
+            outputData: state.outputData);
+      }
+    } else if (event is AutoClock) {
+      yield IoUpdated(
+          clock: state.clock,
+          autoClock: event.autoClock,
           databus: state.databus,
-          control: state.control | ctlMI,
+          control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -47,8 +87,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is Databus) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: event.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -62,8 +104,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is Control) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: event.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -77,8 +121,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is MemoryAddressRegister) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: event.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -94,10 +140,29 @@ class IoBloc extends Bloc<IoEvent, IoState> {
       newMem[state.mar] = event.mem;
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: newMem,
+          instruction: state.instruction,
+          pc: state.pc,
+          areg: state.areg,
+          breg: state.breg,
+          aluresult: state.aluresult,
+          zeroflag: state.zeroflag,
+          overflow: state.overflow,
+          outputData: state.outputData);
+    } else if (event is MemoryLoad) {
+      yield IoUpdated(
+          clock: state.clock,
+          autoClock: state.autoClock,
+          databus: state.databus,
+          control: state.control,
+          controlStep: _step,
+          mar: state.mar,
+          memory: event.mem,
           instruction: state.instruction,
           pc: state.pc,
           areg: state.areg,
@@ -109,8 +174,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is Instruction) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: event.instruction,
@@ -129,8 +196,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
       }
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -144,8 +213,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is ProgramCounterJump) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -161,8 +232,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
         case Reg.A:
           yield IoUpdated(
               clock: state.clock,
+              autoClock: state.autoClock,
               databus: state.databus,
               control: state.control,
+              controlStep: _step,
               mar: state.mar,
               memory: state.memory,
               instruction: state.instruction,
@@ -177,8 +250,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
         case Reg.B:
           yield IoUpdated(
               clock: state.clock,
+              autoClock: state.autoClock,
               databus: state.databus,
               control: state.control,
+              controlStep: _step,
               mar: state.mar,
               memory: state.memory,
               instruction: state.instruction,
@@ -194,8 +269,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is ALUResult) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -209,8 +286,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is Overflow) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -224,8 +303,10 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     } else if (event is OutputData) {
       yield IoUpdated(
           clock: state.clock,
+          autoClock: state.autoClock,
           databus: state.databus,
           control: state.control,
+          controlStep: _step,
           mar: state.mar,
           memory: state.memory,
           instruction: state.instruction,
@@ -248,30 +329,33 @@ class IoBloc extends Bloc<IoEvent, IoState> {
   }
 
   void moduleMAR() {
-    var MI = (state.control & ctlMI) == 0; // invert
+    var MI = (state.control & ctlMI) == ctlMI;
     if (state.clock && MI) {
-      add(MemoryAddressRegister(state.databus));
+      add(MemoryAddressRegister(this.databus));
     }
   }
 
   void ram() {
     if (state.clock && state.control & ctlRI == ctlRI) {
-      add(Memory(state.databus));
+      add(Memory(this.databus));
     }
-    var RO = (state.control & ctlRO) == 0; // Invert
+    var RO = (state.control & ctlRO) == ctlRO;
     if (state.clock && RO) {
       add(Databus(state.memory[state.mar]));
+      databus = state.memory[state.mar];
     }
   }
 
   void instructionRegister() {
-    var IO = (state.control & ctlIO) == 0; // Invert
+    var II = (state.control & ctlII) == ctlII;
+    if (state.clock && II) {
+      add(Instruction(this.databus));
+    }
+
+    var IO = (state.control & ctlIO) == ctlIO;
     if (state.clock && IO) {
       add(Databus(state.instruction));
-    }
-    var II = (state.control & ctlII) == 0; // Invert
-    if (state.clock && II) {
-      add(Instruction(state.databus));
+      databus = state.instruction;
     }
   }
 
@@ -279,31 +363,33 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     if (state.clock && state.control & ctlCE == ctlCE) {
       add(ProgramCounterIncrement());
     }
-    var CO = (state.control & ctlCO) == 0; // Invert
+    var CO = (state.control & ctlCO) == ctlCO;
     if (state.clock && CO) {
-      add(Databus(state.databus & 0xf0 | state.pc & 0x0f));
+      add(Databus(this.databus & 0xf0 | state.pc & 0x0f));
+      this.databus = this.databus & 0xf0 | state.pc & 0x0f;
     }
-    var J = (state.control & ctlJ) == 0; // Invert
+    var J = (state.control & ctlJ) == ctlJ;
     if (state.clock && J) {
-      add(ProgramCounterJump(state.databus & 0x0f));
+      add(ProgramCounterJump(this.databus & 0x0f));
     }
   }
 
   void registerA() {
-    var AI = (state.control & ctlAI) == 0; // Invert
+    var AI = (state.control & ctlAI) == ctlAI;
     if (state.clock && AI) {
-      add(Register(Reg.A, state.databus));
+      add(Register(Reg.A, this.databus));
     }
-    var AO = (state.control & ctlAO) == 0; // Invert
+    var AO = (state.control & ctlAO) == ctlAO;
     if (state.clock && AO) {
       add(Databus(state.areg));
+      databus = state.areg;
     }
   }
 
   void registerB() {
-    var BI = (state.control & ctlBI) == 0; // Invert
+    var BI = (state.control & ctlBI) == ctlBI;
     if (state.clock && BI) {
-      add(Register(Reg.B, state.databus));
+      add(Register(Reg.B, this.databus));
     }
   }
 
@@ -323,22 +409,23 @@ class IoBloc extends Bloc<IoEvent, IoState> {
       }
       add(ALUResult(aluResult));
     }
-    var EO = (state.control & ctlEO) == 0; // Invert
+    var EO = (state.control & ctlEO) == ctlEO;
     if (state.clock && EO) {
       add(Databus(state.aluresult));
+      databus = state.aluresult;
     }
   }
 
   void output() {
     if (state.clock && state.control & ctlOI == ctlOI) {
-      add(OutputData(state.databus));
+      add(OutputData(this.databus));
     }
   }
 
   int _step = 0;
   void controlLogic() {
     if (!state.clock) {
-      switch (assemblyTokens.values[state.instruction]) {
+      switch (assemblyTokens.values[state.instruction >> 4]) {
         case assemblyTokens.LDA:
           switch (_step) {
             case 0:
@@ -352,6 +439,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 3:
               add(Control(ctlRO | ctlAI));
+              break;
+            case 4:
+              add(Control(0));
               _step = 0;
               return;
           }
@@ -409,23 +499,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 3:
               add(Control(ctlAO | ctlRI));
-              _step = 0;
-              return;
-          }
-          break;
-        case assemblyTokens.STA:
-          switch (_step) {
-            case 0:
-              add(Control(ctlCO | ctlMI));
               break;
-            case 1:
-              add(Control(ctlRO | ctlII | ctlCE));
-              break;
-            case 2:
-              add(Control(ctlIO | ctlMI));
-              break;
-            case 3:
-              add(Control(ctlAO | ctlRI));
+            case 4:
+              add(Control(0));
               _step = 0;
               return;
           }
@@ -440,6 +516,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 2:
               add(Control(ctlIO | ctlAI));
+              break;
+            case 3:
+              add(Control(0));
               _step = 0;
               return;
           }
@@ -454,6 +533,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 2:
               add(Control(ctlIO | ctlJ));
+              break;
+            case 3:
+              add(Control(0));
               _step = 0;
               return;
           }
@@ -468,6 +550,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 2:
               add(Control(ctlIO | (state.overflow ? ctlJ : 0)));
+              break;
+            case 3:
+              add(Control(0));
               _step = 0;
               return;
           }
@@ -482,6 +567,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 2:
               add(Control(ctlIO | (state.zeroflag ? ctlJ : 0)));
+              break;
+            case 3:
+              add(Control(0));
               _step = 0;
               return;
           }
@@ -496,6 +584,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 2:
               add(Control(ctlAO | ctlOI));
+              break;
+            case 3:
+              add(Control(0));
               _step = 0;
               return;
           }

@@ -1,5 +1,5 @@
 import 'package:eater_computer/src/bloc/io_bloc.dart';
-import 'package:eater_computer/src/components/led.dart';
+import 'package:eater_computer/src/components/components.dart';
 import 'package:eater_computer/src/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +24,7 @@ class ControlView extends StatelessWidget {
     return BlocBuilder<IoBloc, IoState>(
       builder: (context, state) => Column(
         children: [
-          Text('Control'),
+          ModuleTitle('Control'),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -46,8 +46,17 @@ class ControlView extends StatelessWidget {
               buildItem('FI', state.control & ctlFI == ctlFI),
             ],
           ),
-          Text('${assemblyTokens.values[state.instruction]}'
-              .substring('assemblyTokens.'.length)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('${state.controlStep}'),
+              SizedBox(
+                width: 16,
+              ),
+              Text('${assemblyTokens.values[state.instruction >> 4]}'
+                  .substring('assemblyTokens.'.length)),
+            ],
+          ),
         ],
       ),
     );

@@ -3,7 +3,14 @@ part of 'io_bloc.dart';
 @immutable
 abstract class IoEvent {}
 
+class Reset extends IoEvent {}
+
 class Tick extends IoEvent {}
+
+class AutoClock extends IoEvent {
+  final bool autoClock;
+  AutoClock(this.autoClock) : super();
+}
 
 class Databus extends IoEvent {
   final int databus;
@@ -31,6 +38,11 @@ class Memory extends IoEvent {
   Memory(this.mem) : super();
 }
 
+class MemoryLoad extends IoEvent {
+  final List<int> mem;
+  MemoryLoad(this.mem) : super();
+}
+
 class Instruction extends IoEvent {
   final int instruction;
   Instruction(this.instruction) : super();
@@ -41,11 +53,6 @@ class ProgramCounterIncrement extends IoEvent {}
 class ProgramCounterJump extends IoEvent {
   final int pc;
   ProgramCounterJump(this.pc) : super();
-}
-
-enum Reg {
-  A,
-  B,
 }
 
 class Register extends IoEvent {
