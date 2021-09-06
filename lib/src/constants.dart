@@ -33,3 +33,8 @@ enum assemblyTokens {
   OUT,
   HLT,
 }
+
+enum Reg {
+  A,
+  B,
+}

@@ -1,17 +1,8 @@
 import 'dart:async';
 
-import 'package:eater_computer/src/bloc/io_bloc.dart';
+import 'package:eater_computer/src/bloc/bloc.dart';
 import 'package:eater_computer/src/constants.dart';
-import 'package:eater_computer/src/views/alu_view.dart';
-import 'package:eater_computer/src/views/clock_view.dart';
-import 'package:eater_computer/src/views/control_view.dart';
-import 'package:eater_computer/src/views/databus_view.dart';
-import 'package:eater_computer/src/views/instruction_register_view.dart';
-import 'package:eater_computer/src/views/mar_view.dart';
-import 'package:eater_computer/src/views/output_view.dart';
-import 'package:eater_computer/src/views/program_counter_view.dart';
-import 'package:eater_computer/src/views/ram_view.dart';
-import 'package:eater_computer/src/views/register_view.dart';
+import 'package:eater_computer/src/views/views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -3,6 +3,8 @@ import 'package:eater_computer/src/components/led.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../constants.dart';
+
 class RegisterView extends StatelessWidget {
   const RegisterView(this.register, {Key? key}) : super(key: key);
   final Reg register;
