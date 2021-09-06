@@ -14,14 +14,19 @@ class IoBloc extends Bloc<IoEvent, IoState> {
   late final List<Function> modules;
   IoBloc() : super(IoInitial()) {
     modules = [
-      moduleMAR,
-      ram,
-      instructionRegister,
-      programCounter,
-      registerA,
-      registerB,
-      alu,
-      output,
+      ramOut,
+      instructionRegisterOut,
+      programCounterOut,
+      registerAOut,
+      aluOut,
+      moduleMARIn,
+      ramIn,
+      instructionRegisterIn,
+      programCounterIn,
+      registerAIn,
+      registerBIn,
+      aluIn,
+      outputIn,
       controlLogic,
     ];
   }
@@ -328,17 +333,20 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     }
   }
 
-  void moduleMAR() {
+  void moduleMARIn() {
     var MI = (state.control & ctlMI) == ctlMI;
     if (state.clock && MI) {
       add(MemoryAddressRegister(this.databus));
     }
   }
 
-  void ram() {
+  void ramIn() {
     if (state.clock && state.control & ctlRI == ctlRI) {
       add(Memory(this.databus));
     }
+  }
+
+  void ramOut() {
     var RO = (state.control & ctlRO) == ctlRO;
     if (state.clock && RO) {
       add(Databus(state.memory[state.mar]));
@@ -346,12 +354,14 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     }
   }
 
-  void instructionRegister() {
+  void instructionRegisterIn() {
     var II = (state.control & ctlII) == ctlII;
     if (state.clock && II) {
       add(Instruction(this.databus));
     }
+  }
 
+  void instructionRegisterOut() {
     var IO = (state.control & ctlIO) == ctlIO;
     if (state.clock && IO) {
       add(Databus(state.instruction));
@@ -359,14 +369,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     }
   }
 
-  void programCounter() {
+  void programCounterIn() {
     if (state.clock && state.control & ctlCE == ctlCE) {
       add(ProgramCounterIncrement());
-    }
-    var CO = (state.control & ctlCO) == ctlCO;
-    if (state.clock && CO) {
-      add(Databus(this.databus & 0xf0 | state.pc & 0x0f));
-      this.databus = this.databus & 0xf0 | state.pc & 0x0f;
     }
     var J = (state.control & ctlJ) == ctlJ;
     if (state.clock && J) {
@@ -374,11 +379,22 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     }
   }
 
-  void registerA() {
+  void programCounterOut() {
+    var CO = (state.control & ctlCO) == ctlCO;
+    if (state.clock && CO) {
+      add(Databus(this.databus & 0xf0 | state.pc & 0x0f));
+      this.databus = this.databus & 0xf0 | state.pc & 0x0f;
+    }
+  }
+
+  void registerAIn() {
     var AI = (state.control & ctlAI) == ctlAI;
     if (state.clock && AI) {
       add(Register(Reg.A, this.databus));
     }
+  }
+
+  void registerAOut() {
     var AO = (state.control & ctlAO) == ctlAO;
     if (state.clock && AO) {
       add(Databus(state.areg));
@@ -386,14 +402,14 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     }
   }
 
-  void registerB() {
+  void registerBIn() {
     var BI = (state.control & ctlBI) == ctlBI;
     if (state.clock && BI) {
       add(Register(Reg.B, this.databus));
     }
   }
 
-  void alu() {
+  void aluIn() {
     if (state.clock && state.control & ctlSU == ctlSU) {
       int aluResult = state.areg - state.breg;
       if (aluResult < 0) {
@@ -409,6 +425,9 @@ class IoBloc extends Bloc<IoEvent, IoState> {
       }
       add(ALUResult(aluResult));
     }
+  }
+
+  void aluOut() {
     var EO = (state.control & ctlEO) == ctlEO;
     if (state.clock && EO) {
       add(Databus(state.aluresult));
@@ -416,7 +435,7 @@ class IoBloc extends Bloc<IoEvent, IoState> {
     }
   }
 
-  void output() {
+  void outputIn() {
     if (state.clock && state.control & ctlOI == ctlOI) {
       add(OutputData(this.databus));
     }
@@ -601,7 +620,7 @@ class IoBloc extends Bloc<IoEvent, IoState> {
               break;
             case 2:
               add(Control(ctlHLT));
-              _step = 0;
+              // _step = 0;
               return;
           }
           break;
